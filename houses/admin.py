@@ -18,3 +18,4 @@ class HouseAdmin(admin.ModelAdmin):
         "pets_allowed",
     )
     search_fields = ("address__startswith",)
+    list_editable = ("pets_allowed",)
