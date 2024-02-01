@@ -11,6 +11,7 @@ class RoomAdmin(admin.ModelAdmin):
         "price",
         "kind",
         "pet_friendly",
+        "total_amenities",
         "owner",
         "created_at",
         "updated_at",
