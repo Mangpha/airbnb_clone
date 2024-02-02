@@ -6,15 +6,25 @@ from .serializers import CategorySerializer
 # Create your views here.
 
 
-@api_view()
+@api_view(["GET", "POST"])
 def categories(request):
-    data = CategorySerializer(
-        Category.objects.all(),
-        many=True,
-    ).data
-    return Response(
-        {
-            "ok": True,
-            "categories": data,
-        }
-    )
+    if request.method == "GET":
+        data = CategorySerializer(
+            Category.objects.all(),
+            many=True,
+        ).data
+        return Response(data)
+    elif request.method == "POST":
+        print(request.data)
+        return Response(
+            {
+                "ok": False,
+            }
+        )
+
+
+@api_view()
+def category(request, id):
+    category = Category.objects.get(pk=id)
+    data = CategorySerializer(category).data
+    return Response(data)
