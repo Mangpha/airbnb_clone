@@ -15,12 +15,11 @@ def categories(request):
         ).data
         return Response(data)
     elif request.method == "POST":
-        print(request.data)
-        return Response(
-            {
-                "ok": False,
-            }
-        )
+        serializer = CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            return Response({"created": True})
+        else:
+            return Response(serializer.errors)
 
 
 @api_view()
