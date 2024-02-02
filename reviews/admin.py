@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Review
+from .filters import WordFilter, RatingFilter
 
 # Register your models here.
 
@@ -11,4 +12,9 @@ class ReviewAdmin(admin.ModelAdmin):
         "payload",
     )
 
-    list_filter = ("rating",)
+    list_filter = (
+        WordFilter,
+        RatingFilter,
+        "rating",
+        "user__is_host",
+    )
