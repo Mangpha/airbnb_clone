@@ -1,6 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
+from rest_framework.views import APIView
 from rest_framework.status import HTTP_204_NO_CONTENT
 from .models import Category
 from .serializers import CategorySerializer
@@ -8,15 +9,15 @@ from .serializers import CategorySerializer
 # Create your views here.
 
 
-@api_view(["GET", "POST"])
-def categories(request):
-    if request.method == "GET":
+class Categories(APIView):
+    def get(self, request):
         data = CategorySerializer(
             Category.objects.all(),
             many=True,
         ).data
         return Response(data)
-    elif request.method == "POST":
+
+    def post(self, request):
         serializer = CategorySerializer(data=request.data)
         if serializer.is_valid():
             new_category = serializer.save()
@@ -25,20 +26,20 @@ def categories(request):
             return Response(serializer.errors)
 
 
-@api_view(["GET", "PUT", "DELETE"])
-def category(request, id):
-    try:
-        category = Category.objects.get(pk=id)
-    except Category.DoesNotExist:
-        raise NotFound
+class CategoryDetail(APIView):
+    def get_object(self, id):
+        try:
+            category = Category.objects.get(pk=id)
+        except Category.DoesNotExist:
+            raise NotFound
+        return category
 
-    if request.method == "GET":
-        data = CategorySerializer(category).data
-        return Response(data)
+    def get(self, request, id):
+        return Response(CategorySerializer(self.get_object(id)).data)
 
-    elif request.method == "PUT":
+    def put(self, request, id):
         data = CategorySerializer(
-            category,
+            self.get_object(id),
             data=request.data,
             partial=True,
         )
@@ -48,6 +49,6 @@ def category(request, id):
         else:
             return Response(data.errors)
 
-    elif request.method == "DELETE":
-        category.delete()
+    def delete(self, request, id):
+        self.get_object(id).delete()
         return Response(status=HTTP_204_NO_CONTENT)
