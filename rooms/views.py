@@ -14,6 +14,14 @@ class Rooms(APIView):
         all_rooms = Room.objects.all()
         return Response(RoomListSerializer(all_rooms, many=True).data)
 
+    def post(self, request):
+        serializer = RoomDetailSerializer(data=request.data)
+        if serializer.is_valid():
+            room = serializer.save()
+            return Response(RoomDetailSerializer(room).data)
+        else:
+            return Response(serializer.errors)
+
 
 class RoomDetail(APIView):
 
