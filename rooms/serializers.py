@@ -23,7 +23,6 @@ class RoomDetailSerializer(ModelSerializer):
     class Meta:
         model = Room
         fields = "__all__"
-        depth = 1
 
 
 class RoomListSerializer(ModelSerializer):
