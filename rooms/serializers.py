@@ -25,9 +25,15 @@ class RoomDetailSerializer(ModelSerializer):
     category = CategorySerializer(read_only=True)
 
     rating = SerializerMethodField()
+    is_owner = SerializerMethodField()
 
     def get_rating(self, room):
+        print(self.context)
         return room.rating()
+
+    def get_is_owner(self, room):
+        request = self.context["request"]
+        return room.owner == request.user
 
 
 class RoomListSerializer(ModelSerializer):
@@ -41,9 +47,15 @@ class RoomListSerializer(ModelSerializer):
             "city",
             "price",
             "rating",
+            "is_owner",
         )
 
     rating = SerializerMethodField()
+    is_owner = SerializerMethodField()
 
     def get_rating(self, room):
         return room.rating()
+
+    def get_is_owner(self, room):
+        request = self.context["request"]
+        return room.owner == request.user

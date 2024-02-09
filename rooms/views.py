@@ -19,7 +19,13 @@ class Rooms(APIView):
 
     def get(self, request):
         all_rooms = Room.objects.all()
-        return Response(RoomListSerializer(all_rooms, many=True).data)
+        return Response(
+            RoomListSerializer(
+                all_rooms,
+                many=True,
+                context={"request": request},
+            ).data
+        )
 
     def post(self, request):
         if request.user.is_authenticated:
@@ -60,7 +66,12 @@ class RoomDetail(APIView):
 
     def get(self, request, pk):
         room = self.get_object(pk)
-        return Response(RoomDetailSerializer(room).data)
+        return Response(
+            RoomDetailSerializer(
+                room,
+                context={"request": request},
+            ).data
+        )
 
     def put(self, request, pk):
         room = self.get_object(pk)
