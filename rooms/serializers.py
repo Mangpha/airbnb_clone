@@ -1,7 +1,13 @@
+# DRF Import
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
+
+# Model Import
 from .models import Amenity, Room
+
+# Serializers Import
 from users.serializers import TinyUserSerializer
 from categories.serializers import CategorySerializer
+from medias.serializers import PhotoSerializer
 
 
 class AmenitySerializer(ModelSerializer):
@@ -23,6 +29,7 @@ class RoomDetailSerializer(ModelSerializer):
     owner = TinyUserSerializer(read_only=True)
     amenities = AmenitySerializer(read_only=True, many=True)
     category = CategorySerializer(read_only=True)
+    photos = PhotoSerializer(read_only=True, many=True)
 
     rating = SerializerMethodField()
     is_owner = SerializerMethodField()
@@ -46,9 +53,12 @@ class RoomListSerializer(ModelSerializer):
             "country",
             "city",
             "price",
+            "photos",
             "rating",
             "is_owner",
         )
+
+    photos = PhotoSerializer(read_only=True, many=True)
 
     rating = SerializerMethodField()
     is_owner = SerializerMethodField()
