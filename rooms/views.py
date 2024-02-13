@@ -1,5 +1,8 @@
+# Django Import
 from django.db import transaction
 from django.conf import settings
+
+# DRF Import
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.exceptions import (
@@ -9,10 +12,15 @@ from rest_framework.exceptions import (
     PermissionDenied,
 )
 from rest_framework.status import HTTP_204_NO_CONTENT
+
+# Model Import
 from .models import Amenity, Room
 from reviews.models import Review
-from reviews.serializers import ReviewSerializer
 from categories.models import Category
+
+# Serializers Import
+from reviews.serializers import ReviewSerializer
+from medias.serializers import PhotoSerializer
 from .serializers import AmenitySerializer, RoomListSerializer, RoomDetailSerializer
 
 # Create your views here.
@@ -158,7 +166,18 @@ class RoomPhotos(APIView):
             raise NotFound
 
     def post(self, request, pk):
-        pass
+        room = self.get_object(pk)
+        if not request.user.is_authenticated:
+            raise NotAuthenticated
+        if request.user != room.owner:
+            raise PermissionDenied
+        serializer = PhotoSerializer(data=request.data)
+        if serializer.is_valid():
+            photo = serializer.save(room=room)
+            serializer = PhotoSerializer(photo)
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
 
 
 class RoomAmenities(APIView):
