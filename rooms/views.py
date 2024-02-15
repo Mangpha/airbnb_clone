@@ -1,13 +1,13 @@
 # Django Import
 from django.db import transaction
 from django.conf import settings
+from django.utils import timezone
 
 # DRF Import
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.exceptions import (
     NotFound,
-    NotAuthenticated,
     ParseError,
     PermissionDenied,
 )
@@ -16,13 +16,14 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 # Model Import
 from .models import Amenity, Room
-from reviews.models import Review
 from categories.models import Category
+from bookings.models import Booking
 
 # Serializers Import
 from reviews.serializers import ReviewSerializer
 from medias.serializers import PhotoSerializer
 from .serializers import AmenitySerializer, RoomListSerializer, RoomDetailSerializer
+from bookings.serializers import PublicBookingSerializer
 
 # Create your views here.
 
@@ -211,6 +212,28 @@ class RoomAmenities(APIView):
         start = (page - 1) * page_size
         end = start + page_size
         serializer = AmenitySerializer(room.amenities.all()[start:end], many=True)
+        return Response(serializer.data)
+
+
+class RoomBookings(APIView):
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_object(self, pk):
+        try:
+            return Room.objects.get(pk=pk)
+        except Room.DoesNotExist:
+            raise NotFound
+
+    def get(self, request, pk):
+        room = self.get_object(pk)
+        now = timezone.localtime(timezone.now()).date()
+        bookings = Booking.objects.filter(
+            room=room,
+            kind=Booking.BookingKindChoices.ROOM,
+            check_in__gt=now,
+        )
+        serializer = PublicBookingSerializer(bookings, many=True)
         return Response(serializer.data)
 
 
