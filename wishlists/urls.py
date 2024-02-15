@@ -2,8 +2,10 @@
 from django.urls import path
 
 # View Imports
-from .views import Wishlists
+from .views import RoomsWishlistToggle, RoomsWishlists, RoomsWishlistDetail
 
 urlpatterns = [
-    path("", Wishlists.as_view()),
+    path("", RoomsWishlists.as_view()),
+    path("<int:pk>/", RoomsWishlistDetail.as_view()),
+    path("<int:pk>/rooms/<int:room_pk>/", RoomsWishlistToggle.as_view()),
 ]
