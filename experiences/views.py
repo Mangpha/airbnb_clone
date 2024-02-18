@@ -1,9 +1,25 @@
+# DRF Imports
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 from rest_framework import status
-from .models import Perk
-from .serializers import PerkSerializer
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
+# Model Imports
+from .models import Perk, Experience
+
+# Serializer Imports
+from .serializers import PerkSerializer, ExperienceListSerializer
+
+
+class Experiences(APIView):
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request):
+        experiences = Experience.objects.all()
+        serializer = ExperienceListSerializer(experiences, many=True)
+        return Response(serializer.data)
 
 
 class Perks(APIView):

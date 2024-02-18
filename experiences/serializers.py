@@ -1,5 +1,25 @@
+# DRF Imports
 from rest_framework.serializers import ModelSerializer
-from .models import Perk
+
+# Model Imports
+from .models import Perk, Experience
+
+
+class ExperienceListSerializer(ModelSerializer):
+
+    class Meta:
+        model = Experience
+        fields = (
+            "id",
+            "country",
+            "city",
+            "name",
+            "host",
+            "price",
+            "address",
+            "start",
+            "end",
+        )
 
 
 class PerkSerializer(ModelSerializer):
