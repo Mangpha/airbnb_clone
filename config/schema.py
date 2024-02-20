@@ -28,4 +28,14 @@ class Query:
         return movies_db[movie_id - 1]
 
 
-schema = strawberry.Schema(query=Query)
+@strawberry.type
+class Mutation:
+
+    @strawberry.field
+    def add_movie(self, title: str, year: int, rating: float) -> Movie:
+        new_movie = Movie(id=len(movies_db) + 1, title=title, year=year, rating=rating)
+        movies_db.append(new_movie)
+        return new_movie
+
+
+schema = strawberry.Schema(query=Query, mutation=Mutation)
