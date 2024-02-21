@@ -1,6 +1,7 @@
 import strawberry
 from strawberry import auto
 
+from users.types import UserType
 from . import models
 
 
@@ -9,3 +10,4 @@ class RoomType:
     id: auto
     name: auto
     kind: auto
+    owner: "UserType"
