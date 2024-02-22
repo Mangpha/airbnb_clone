@@ -31,7 +31,6 @@ class RoomType:
 
     @strawberry.field
     def is_owner(self, info: Info) -> bool:
-        print(info.context)
         return self.owner == info.context.request.user
 
     @strawberry.field

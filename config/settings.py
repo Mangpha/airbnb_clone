@@ -152,3 +152,12 @@ MEDIA_URL = "user-uploads/"
 
 # Local Values
 PAGE_SIZE = 3
+
+
+# DRF
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "config.authentication.TrustMeBroAuthentication",
+    ]
+}
