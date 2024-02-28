@@ -1,4 +1,5 @@
 import jwt
+import requests
 
 # Django Imports
 from django.contrib.auth import authenticate, login, logout
@@ -139,5 +140,18 @@ class JwtLogin(APIView):
 class GithubLogin(APIView):
     def post(self, request):
         code = request.data.get("code")
-        print(code)
+        access_token = (
+            requests.post(
+                f"https://github.com/login/oauth/access_token?code={code}&client_id=eeaab2f46b563afbd1bb&scope=read:user,user:email&client_secret={settings.GH_SECRET}",
+                headers={
+                    "Accept": "application/json",
+                },
+            )
+            .json()
+            .get("access_token")
+        )
+        user_data = requests.get(
+            "https://api.github.com/user",
+            headers={"Authorization": f"Bearer {access_token}"},
+        ).json()
         return Response()
