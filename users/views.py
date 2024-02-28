@@ -139,19 +139,40 @@ class JwtLogin(APIView):
 
 class GithubLogin(APIView):
     def post(self, request):
-        code = request.data.get("code")
-        access_token = (
-            requests.post(
-                f"https://github.com/login/oauth/access_token?code={code}&client_id=eeaab2f46b563afbd1bb&scope=read:user,user:email&client_secret={settings.GH_SECRET}",
-                headers={
-                    "Accept": "application/json",
-                },
+        try:
+            code = request.data.get("code")
+            access_token = (
+                requests.post(
+                    f"https://github.com/login/oauth/access_token?code={code}&client_id=eeaab2f46b563afbd1bb&scope=read:user,user:email&client_secret={settings.GH_SECRET}",
+                    headers={
+                        "Accept": "application/json",
+                    },
+                )
+                .json()
+                .get("access_token")
             )
-            .json()
-            .get("access_token")
-        )
-        user_data = requests.get(
-            "https://api.github.com/user",
-            headers={"Authorization": f"Bearer {access_token}"},
-        ).json()
-        return Response()
+            user_data = requests.get(
+                "https://api.github.com/user",
+                headers={"Authorization": f"Bearer {access_token}"},
+            ).json()
+            user_email = requests.get(
+                "https://api.github.com/user/emails",
+                headers={"Authorization": f"Bearer {access_token}"},
+            ).json()
+            try:
+                user = models.User.objects.get(email=user_email[0]["email"])
+                login(request, user)
+                return Response(status=status.HTTP_200_OK)
+            except models.User.DoesNotExist:
+                user = models.User.objects.create(
+                    username=user_data.get("login"),
+                    email=user_email[0]["email"],
+                    name=user_data.get("name"),
+                    avatar=user_data.get("avatar_url"),
+                )
+                user.set_unusable_password()
+                user.save()
+                login(request, user)
+                return Response(status=status.HTTP_200_OK)
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
