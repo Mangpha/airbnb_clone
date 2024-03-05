@@ -1,3 +1,8 @@
+import requests
+
+# Django Import
+from django.conf import settings
+
 # DRF Import
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -27,3 +32,13 @@ class PhotoDetail(APIView):
             raise PermissionDenied()
         photo.delete()
         return Response(status=HTTP_204_NO_CONTENT)
+
+
+class GetUploadURL(APIView):
+    def post(self, request):
+        url = f"https://api.cloudflare.com/client/v4/accounts/{settings.CF_ID}/images/v2/direct_upload"
+        get_url = requests.post(
+            url, headers={"Authorization": f"Bearer {settings.CF_TOKEN}"}
+        )
+        data = get_url.json()
+        return Response(data)
