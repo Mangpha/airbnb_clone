@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 import environ
 import dj_database_url
+import sentry_sdk
 
 env = environ.Env()
 
@@ -199,3 +200,16 @@ CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
 GH_SECRET = env("GH_SECRET")
 CF_ID = env("CF_ID")
 CF_TOKEN = env("CF_TOKEN")
+
+
+if not DEBUG:
+    sentry_sdk.init(
+        dsn="https://cd17f40759b9e7d1ba56c4174393fbe1@o4506874266976256.ingest.us.sentry.io/4506874271760384",
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        traces_sample_rate=1.0,
+        # Set profiles_sample_rate to 1.0 to profile 100%
+        # of sampled transactions.
+        # We recommend adjusting this value in production.
+        profiles_sample_rate=1.0,
+    )
